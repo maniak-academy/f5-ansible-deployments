@@ -11,27 +11,19 @@
     password: "W3lcome098!"
 
     # Application Information
-    partition: preprodapps
-    appAS3tempalte: as3_basic.json
+    partition: preprodsecureapps
+    appAS3tempalte: as3_https.json
     apps:
       - name: webapp
-        vsip: 10.39.2.1
-        vsport: 80
+        vsip: 10.11.3.1
+        vsport: 443
         memberport: 8080
         poolname: web_pool
+        webtls: webtlsabc
         members:
-          - 10.39.2.2
-          - 10.39.2.3
-          - 10.39.2.4
-      - name: api
-        vsip: 10.39.3.1
-        vsport: 3000
-        memberport: 3000
-        poolname: api_pool
-        members:
-          - 10.39.3.2
-          - 10.39.3.3
-          - 10.39.3.4
+          - 10.1.0.1
+          - 10.1.0.2
+          - 10.1.0.3
     
 
   tasks:
