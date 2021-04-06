@@ -12,7 +12,7 @@
 
     # Application Information
     partition: preprodapps
-    appAS3tempalte: as3_basic.json
+    appAS3tempalte: as3_basics.json
     apps:
       - name: webapp
         vsip: 10.39.2.1

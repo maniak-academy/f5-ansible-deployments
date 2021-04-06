@@ -17,6 +17,11 @@ There are two playbooks one to create an app and one to delete an application
 * Tested execution time: ~12s + minimum increase per additional App.
 * ~3 Lines of Tasks
 
+#### Creating AS3 App templates 
+
+https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/userguide/template-authoring.html
+
+
 
 ## Imperative
 
