@@ -1,0 +1,30 @@
+---
+- name: Classic APP Delete Imperative model
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+
+  vars_prompt:
+  - name: partition
+    prompt: What parition do you want to delete?
+    private: no
+    
+  vars:
+    bigipmgmt: "192.168.32.100"
+    user: "admin"
+    password: "W3lcome098!"
+
+  tasks:
+    - name: PUSH AS3
+      uri:
+        url: "https://192.168.32.100:443/mgmt/shared/appsvcs/declare/{{ partition }}"
+        method: DELETE
+        status_code: 200
+        timeout: 300
+        body_format: json
+        force_basic_auth: true
+        user: "{{user}}"
+        password: "{{password}}"
+        validate_certs: false
+      delegate_to: localhost

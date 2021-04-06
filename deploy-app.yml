@@ -1,0 +1,52 @@
+---
+- name: Classic APP Deployment Declarative model
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    bigipmgmt: "192.168.32.100"
+    user: "admin"
+    password: "W3lcome098!"
+
+    partition: preprodapps
+    apps:
+      - name: webapp
+        vsip: 10.39.2.1
+        vsport: 80
+        memberport: 8080
+        poolname: web_pool
+        members:
+          - 10.39.2.2
+          - 10.39.2.3
+          - 10.39.2.4
+      - name: api
+        vsip: 10.39.3.1
+        vsport: 3000
+        memberport: 3000
+        poolname: api_pool
+        members:
+          - 10.39.3.2
+          - 10.39.3.3
+          - 10.39.3.4
+    
+
+  tasks:
+    - name: CREATE AS3 JSON BODY
+      set_fact:
+        as3_app_body: "{{ lookup('template', 'templates/as3_templ.json', split_lines=False) }}"
+
+  
+    - name: PUSH AS3
+      uri:
+        url: "https://{{bigipmgmt}}:443/mgmt/shared/appsvcs/declare"
+        method: POST
+        body: "{{ lookup('template', 'templates/as3_templ.json') }}"
+        status_code: 200
+        timeout: 300
+        body_format: json
+        force_basic_auth: true
+        user: "{{user}}"
+        password: "{{password}}"
+        validate_certs: false
+      delegate_to: localhost
