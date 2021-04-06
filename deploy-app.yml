@@ -5,11 +5,14 @@
   gather_facts: false
 
   vars:
+    # Device Information
     bigipmgmt: "192.168.32.100"
     user: "admin"
     password: "W3lcome098!"
 
+    # Application Information
     partition: preprodapps
+    appAS3tempalte: as3_basic.json
     apps:
       - name: webapp
         vsip: 10.39.2.1
@@ -34,14 +37,14 @@
   tasks:
     - name: CREATE AS3 JSON BODY
       set_fact:
-        as3_app_body: "{{ lookup('template', 'templates/as3_templ.json', split_lines=False) }}"
+        as3_app_body: "{{ lookup('template', 'templates//{{ appAS3tempalte }}', split_lines=False) }}"
 
   
     - name: PUSH AS3
       uri:
         url: "https://{{bigipmgmt}}:443/mgmt/shared/appsvcs/declare"
         method: POST
-        body: "{{ lookup('template', 'templates/as3_templ.json') }}"
+        body: "{{ lookup('template', 'templates/{{ appAS3tempalte }}') }}"
         status_code: 200
         timeout: 300
         body_format: json
