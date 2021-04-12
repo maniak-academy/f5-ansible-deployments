@@ -178,6 +178,14 @@
             provider: "{{ provider }}"
           delegate_to: localhost
 
+        - name: Add the iRule contained in template irule.tcl to the LTM module
+          bigip_irule:
+            state: "{{ state }}"
+            name: MaintenanceIrule
+            state: "{{ state }}"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
         - name: Delete partition
           bigip_partition:
             name: "{{ app['partition'] }}"
