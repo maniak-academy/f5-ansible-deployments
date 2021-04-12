@@ -11,7 +11,7 @@
       server_port: 443
       validate_certs: false
     app:
-      partition: ColPrevious
+      partition: Common
       name: web
       vsip: 10.39.1.1
       vsport: 80
