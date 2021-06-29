@@ -1,5 +1,6 @@
-#Specifies the current state of the node. enabled (All traffic allowed), specifies the system sends traffic to this node regardless of the node's state. disabled (Only persistent or active connections allowed), specifies the node can handle only persistent or active connections. offline (Only active connections allowed), specifies the node can handle only active connections. In all cases except absent, the node will be created if it does not yet exist.
-#Be particularly careful about changing the status of a node whose FQDN cannot be resolved. These situations disable your ability to change their state to disabled or offline. They will remain in an *Unavailable - Enabled* state.
+#enabled = online 
+#disabled = (Only persistent or active connections allowed),
+#offline (Only active connections allowed)
 
 ---
 - name: "Node Management"
@@ -33,12 +34,3 @@
         name: "{{node_name}}"
         provider: "{{provider}}"
       delegate_to: localhost
-
-    - name: Query BIG-IP facts
-      f5networks.f5_modules.bigip_device_info:
-        provider: "{{provider}}"
-        gather_subset:
-          - nodes
-      register: bigip_facts
-
-
