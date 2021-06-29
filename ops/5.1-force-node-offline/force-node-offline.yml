@@ -1,0 +1,59 @@
+---
+- name: "Disabling a pool member"
+  hosts: lb
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Setup provider
+      set_fact:
+        provider:
+          server: "{{private_ip}}"
+          user: "{{ansible_user}}"
+          password: "{{ansible_ssh_pass}}"
+          server_port: 443
+          validate_certs: false
+
+
+
+
+    - name: Query BIG-IP facts
+      f5networks.f5_modules.bigip_device_info:
+        provider: "{{provider}}"
+        gather_subset:
+          - nodes
+      register: bigip_facts
+
+    - name: Display Nodes available
+      debug: "msg={{item.name}}"
+      loop: "{{bigip_facts.nodes}}"
+      loop_control:
+        label: "{{item.name}}"
+
+    - name: Store pool name in a variable
+      set_fact:
+        bigip_node: "{{item.name}}"
+      loop: "{{bigip_facts.nodes}}"
+      no_log: true
+
+
+    - pause:
+        prompt: "To disable a particular member enter member with format member_name:port \nTo disable all members of the pool enter 'all'"
+      register: nodes
+
+    - name: Disable ALL pool members
+      bigip_node:
+        provider: "{{provider}}"
+        state: "disabled"
+        name: "{{item.name}}"
+      when: '"all" in member_name.user_input'
+
+    - name: Disable pool member {{member_name.user_input}}
+      bigip_node:
+        provider: "{{provider}}"
+        state: "forced_offline"
+        name: "{{member_name.user_input.split(':')[0]}}"
+        pool: "{{pool_name}}"
+        port: "{{member_name.user_input.split(':')[1]}}"
+        host: "{{hostvars[member_name.user_input.split(':')[0]].ansible_host}}"
+      when: '"all" not in member_name.user_input'

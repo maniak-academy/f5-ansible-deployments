@@ -1,0 +1,173 @@
+- name: Classic APP Deployment Imperative model
+  hosts: f5
+  connection: local
+  gather_facts: false
+
+  vars:
+    provider:
+      server: "F5"
+      user: "admin"
+      password: "W3lcome098!"
+      server_port: 443
+      validate_certs: false
+    app:
+      partition: Common
+      name: ansible-demo-http-vs
+      description: Builds F5 VIP with Cookie and HTTP Profile with XForward enabled
+      vsip: 10.11.1.1
+      vsport: 80
+      cookiename: ansible-cookie
+      memberport: 8080
+      poolname: ansible-poolname
+      members:
+        - 10.10.10.6
+        - 10.10.10.3
+        - 10.10.10.4
+    state: present
+
+  tasks:
+
+    - name: Create
+      block:
+
+        - name: Create partition
+          bigip_partition:
+            name: "{{ app['partition'] }}"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Create HTTP Monitor
+          bigip_monitor_http:
+            state: "{{ state }}"
+            name: http_mon
+            receive: "I AM UP"
+            partition: "{{ app['partition'] }}"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Create Pool
+          bigip_pool:
+            state: "{{ state }}"
+            name: "{{ app['poolname'] }}"
+            partition: "{{ app['partition'] }}"
+            monitors:
+              - http_mon
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Add pool members
+          bigip_pool_member:
+            state: "{{ state }}"
+            pool: "{{ app['poolname'] }}"
+            partition: "{{ app['partition'] }}"
+            host: "{{ item }}"
+            port: "{{ app['memberport'] }}"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+          loop: "{{ app['members'] }}"
+
+        - name: Create a persistence cookie profile
+          bigip_profile_persistence_cookie:
+            state: "{{ state }}"
+            name: "{{ app['cookiename'] }}"
+            provider: "{{ provider }}"
+            cookie_name: "{{ app['cookiename'] }}"
+          delegate_to: localhost
+
+        - name: Create HTTP profile
+          bigip_profile_http:
+            state: "{{ state }}"
+            name: "{{ app['name'] }}-http-profile"
+            insert_xforwarded_for: yes
+            redirect_rewrite: all
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Create a TCP profile
+          bigip_profile_tcp:
+            state: "{{ state }}"
+            name: "{{ app['name'] }}-tcp"
+            parent: tcp
+            idle_timeout: "300"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Add virtual server
+          bigip_virtual_server:
+            state: "{{ state }}"
+            description: "{{ app['description'] }}"
+            partition: "{{ app['partition'] }}"
+            name: "{{ app['name'] }}"
+            destination: "{{ app['vsip'] }}"
+            port: "{{ app['vsport'] }}"
+            pool: "{{ app['poolname'] }}"
+            profiles:
+              - "{{ app['name'] }}-tcp"
+              - "{{ app['name'] }}-http-profile"
+            default_persistence_profile: "{{ app['cookiename'] }}"
+            snat: Automap
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+      rescue: # BACKOUT LOGIC
+
+        - set_fact:
+            state: absent
+
+        - name: Delete virtual server
+          bigip_virtual_server:
+            state: "{{ state }}"
+            partition: "{{ app['partition'] }}"
+            name: "{{ app['name'] }}"
+            destination: "{{ app['vsip'] }}"
+            port: "{{ app['vsport'] }}"
+            pool: "{{ app['poolname'] }}"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Delete Pool
+          bigip_pool:
+            state: "{{ state }}"
+            name: "{{ app['poolname'] }}"
+            partition: "{{ app['partition'] }}"
+            monitors:
+              - http_mon
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Delete HTTP Monitor
+          bigip_monitor_http:
+            state: "{{ state }}"
+            name: http_mon
+            receive: "I AM UP"
+            partition: "{{ app['partition'] }}"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Delete a persistence cookie profile
+          bigip_profile_persistence_cookie:
+            state: "{{ state }}"
+            name: "{{ app['cookiename'] }}"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Delete HTTP profile
+          bigip_profile_http:
+            state: "{{ state }}"
+            name: "{{ app['name'] }}-http-profile"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Create a TCP profile
+          bigip_profile_tcp:
+            state: "{{ state }}"
+            name: "{{ app['name'] }}-tcp"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+
+        - name: Delete partition
+          bigip_partition:
+            name: "{{ app['partition'] }}"
+            provider: "{{ provider }}"
+          delegate_to: localhost
+

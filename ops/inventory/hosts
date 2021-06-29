@@ -1,0 +1,3 @@
+
+[lb]
+f5 ansible_host=f5 ansible_user=admin private_ip=f5 ansible_ssh_pass=W3lcome098!
