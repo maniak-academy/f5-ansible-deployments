@@ -1,0 +1,35 @@
+---
+- name: "Disabling a pool member"
+  hosts: lb
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Setup provider
+      set_fact:
+        provider:
+          server: "{{private_ip}}"
+          user: "{{ansible_user}}"
+          password: "{{ansible_ssh_pass}}"
+          server_port: 443
+          validate_certs: false
+
+    - name: Query BIG-IP facts
+      f5networks.f5_modules.bigip_device_info:
+        provider: "{{provider}}"
+        gather_subset:
+          - nodes
+      register: bigip_facts
+
+    - name: Display Nodes available
+      debug: "msg={{item.name}}"
+      loop: "{{bigip_facts.nodes}}"
+      loop_control:
+        label: "{{item.name}}"
+
+    - name: Store Node names in a variable
+      set_fact:
+        bigip_node: "{{item.name}}"
+      loop: "{{bigip_facts.nodes}}"
+      no_log: true
+
