@@ -1,0 +1,44 @@
+#imports an ssl cert
+
+---
+- name: "TLS Cert Management"
+  hosts: lb
+  gather_facts: false
+  connection: local
+
+  vars_prompt:
+    - name: node_name
+      prompt: What is the node name?
+      private: no
+      
+    - name: state
+      prompt: What do you want to do "disabled" or "enabled" "offline"
+      private: no
+
+  tasks:
+    - name: Setup provider
+      set_fact:
+        provider:
+          server: "{{private_ip}}"
+          user: "{{ansible_user}}"
+          password: "{{ansible_ssh_pass}}"
+          server_port: 443
+          validate_certs: false
+
+    - name: Import both key and cert
+      bigip_ssl_key_cert:
+        key_content: "{{ lookup('file', 'key.pem') }}"
+        key_name: cert1
+        cert_content: "{{ lookup('file', 'cert.pem') }}"
+        cert_name: cert1
+        state: absent
+        provider: "{{provider}}"
+      delegate_to: localhost
+
+    - name: Use a file lookup to import CA certificate chain
+      bigip_ssl_certificate:
+        name: ca-chain-name
+        state: absent
+        content: "{{ lookup('file', '/path/to/ca-chain.crt') }}"
+        provider: "{{provider}}"
+      delegate_to: localhost
