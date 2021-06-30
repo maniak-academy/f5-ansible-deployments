@@ -1,0 +1,51 @@
+# The following playbook generares a CSR 
+
+---
+- name: "TLS Cert Management"
+  hosts: lb
+  gather_facts: false
+  connection: local
+
+  vars_prompt:
+
+    - name: f5_device
+      prompt: What F5 device are you connecting to specific the FQQN?
+      private: no
+
+    - name: csr_name
+      prompt: "What is the name of the csr-name"
+      private: no
+
+    - name: common_name
+      prompt: What is the name of the common_name?
+      private: no
+
+
+  tasks:
+    - name: Setup the connection to the F5 Device
+      set_fact:
+        provider:
+          server: "{{f5_device}}"
+          user: "{{ansible_user}}"
+          password: "{{ansible_ssh_pass}}"
+          server_port: 443
+          validate_certs: false
+
+    - name: Create an SSL csr
+      bigip_command:
+        commands:
+          - create sys crypto csr '{{csr_name}}' common-name '{{common_name}}'  Toronot email-address netopslan@app.com key default.key locatoi
+        provider: "{{provider}}"
+      delegate_to: localhost
+
+    - name: list
+      bigip_command:
+        commands:
+          - list sys crypto csr '{{csr_name}}' 
+        provider: "{{provider}}"
+      register: bigip_facts
+      delegate_to: localhost
+
+    - name: "Print output for bigip_facts"
+      debug:
+        var: bigip_facts.stdout
