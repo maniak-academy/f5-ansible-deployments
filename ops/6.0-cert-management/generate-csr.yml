@@ -13,7 +13,7 @@
       private: no
 
     - name: csr_name
-      prompt: "What is the name of the csr-name"
+      prompt: "What is the name of the csr-name \n Name : FQDN_YYYYMM.crt, for eg example.com_202003.crt?"
       private: no
 
     - name: common_name
@@ -34,14 +34,14 @@
     - name: Create an SSL csr
       bigip_command:
         commands:
-          - create sys crypto csr '{{csr_name}}' common-name '{{common_name}}'  Toronot email-address netopslan@app.com key default.key locatoi
+          - create sys crypto csr '{{csr_name}}' common-name '{{common_name}}' email-address abs@abs.com key default.key 
         provider: "{{provider}}"
       delegate_to: localhost
 
     - name: list
       bigip_command:
         commands:
-          - list sys crypto csr '{{csr_name}}' 
+          - list sys crypto csr {{csr_name}}
         provider: "{{provider}}"
       register: bigip_facts
       delegate_to: localhost
