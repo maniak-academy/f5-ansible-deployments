@@ -15,19 +15,15 @@
       private: no
 
   tasks:
-    - name: Get failover state
+    - name: Task 1 - Get failover state
       bigip_command:
         commands:
           - show sys failover
         provider: "{{ provider }}" 
       register: failover_state
 
-    - name: Display Get failover state
-      debug:
-        var: failover_state
-
     - block:
-      - name: Verify running configuration of the BIG-IP
+      - name: Task 2 - Verify running configuration of the BIG-IP
         bigip_command:
           commands:
             - load sys config verify
@@ -35,27 +31,27 @@
   
       - name: Wait for configuration to finish loading
         wait_for:
-          timeout: 3
+          timeout: 45
         delegate_to: localhost
 
-      - name: Get current time on BIG-IP
+      - name: Task 4 - Get current time on BIG-IP
         command: date "+%H%M%S-%m%d%y"
         register: date
 
-      - name: Download a new UCS
+      - name: Task 5 - Download a new UCS
         bigip_ucs_fetch:
           src: "{{ inventory_hostname + '-' + date.stdout +  '-backup.ucs' }}"
           dest: "{{ 'files/' + inventory_hostname + '-' + date.stdout +  '-backup.ucs' }}"
           provider: "{{ provider }}"
         delegate_to: localhost
 
-      - name: Upload image to the BIG-IP
+      - name: Task 6 - Upload image to the BIG-IP
         bigip_software_image:
          image: "{{ 'files/BIGIP-' + version  + '.iso' }}"
          provider: "{{ provider }}"
         delegate_to: localhost
 
-      - name: Install BIG-IP software
+      - name: Task 7 - Install BIG-IP software
         bigip_software_install:
           image: "{{ 'BIGIP-' + version  + '.iso' }}"
           state: installed
@@ -65,7 +61,7 @@
         async: 45
         poll: 0
 
-      - name: Verify the system was installed
+      - name: Task 8 - Verify the system was installed
         bigip_device_info:
           gather_subset: 
             - software-volumes
@@ -80,7 +76,7 @@
         tags:
           - verify
 
-      - name: Copy the config from HD1.1 to HD1.2 cpcfg --source=HD1.1 --reboot HD1.2    
+      - name: Task 9 - Copy the config from HD1.1 to HD1.2 cpcfg --source=HD1.1 --reboot HD1.2    
         raw: curl -u "{{bigip_username}}":"{{bigip_password}}" -k https://"{{ansible_host}}":443/mgmt/tm/util/bash  -H "Content-type:application/json" -d "{\"command\":\"run\",\"utilCmdArgs\":\"-c 'cpcfg --source=HD1.1 --reboot HD1.2'\"}"
         ignore_errors: True
         register: cpcfg
