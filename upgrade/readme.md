@@ -11,6 +11,7 @@ The following playbook will upgrade your F5 device automatically
 
 Which version does it work with 
 | version | ltm | asm | apm | f5-dns |
+|---|---|---|---|---|
 | v12 | pass | pass | pass | pass |
 | v13 | pass | pass | pass | pass |
 | v14 | pass | pass | pass | pass |
