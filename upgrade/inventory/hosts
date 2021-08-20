@@ -1,0 +1,4 @@
+
+[lb]
+f51 ansible_host=192.168.86.50 bigip_username=admin bigip_password=admin
+f51 ansible_host=192.168.86.50 bigip_username=admin bigip_password=admin

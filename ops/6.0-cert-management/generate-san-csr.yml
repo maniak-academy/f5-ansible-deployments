@@ -1,0 +1,56 @@
+# The following playbook generares a CSR 
+
+---
+- name: "TLS Cert Management"
+  hosts: lb
+  gather_facts: false
+  connection: local
+
+  vars_prompt:
+
+    - name: f5_device
+      prompt: What F5 device are you connecting to specific the FQQN?
+      private: no
+
+    - name: csr_name
+      prompt: "What is the name of the csr-name \n Name : FQDN_YYYYMM.crt, for eg example.com_202003.crt?"
+      private: no
+
+    - name: common_name
+      prompt: What is the name of the common_name?
+      private: no
+
+    - name: san_names
+      prompt: "Please specify the SAN Name. Include DNS: or IP: before the name and separat by commas [Ex DNS:www.exchange.example.com, DNS:www.example.comm] "
+      private: no
+
+  tasks:
+    - name: Setup the connection to the F5 Device
+      set_fact:
+        provider:
+          server: "{{f5_device}}"
+          user: "{{ansible_user}}"
+          password: "{{ansible_ssh_pass}}"
+          server_port: 443
+          validate_certs: false
+
+    - name: Create an SSL csr
+      bigip_command:
+        commands:
+          - create sys crypto csr '{{csr_name}}' common-name '{{common_name}}' organization "Canadian Tire Corporation, Limited" city "Toronto" State "ON" Country "CA" email-address "netopslan@cantire.com" subject-alternative-name '{{san_names}}' key default.key
+        provider: "{{provider}}"
+      delegate_to: localhost
+      args:
+         warn: false
+
+    - name: list
+      bigip_command:
+        commands:
+          - list sys crypto csr {{csr_name}}
+        provider: "{{provider}}"
+      register: bigip_facts
+      delegate_to: localhost
+
+    - name: "Print output for bigip_facts"
+      debug:
+        var: bigip_facts.stdout

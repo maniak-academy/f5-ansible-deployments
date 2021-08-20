@@ -34,9 +34,11 @@
     - name: Create an SSL csr
       bigip_command:
         commands:
-          - create sys crypto csr '{{csr_name}}' common-name '{{common_name}}' email-address abs@abs.com key default.key 
+          - create sys crypto csr '{{csr_name}}' common-name '{{common_name}}' organization "SebbyCorp Wheels Corporation, Limited" city "Toronto" State "ON" Country "CA" email-address "netopslan@canWheels.com" subject-alternative-name '{{san_names}}' key default.key
         provider: "{{provider}}"
       delegate_to: localhost
+      args:
+         warn: false
 
     - name: list
       bigip_command:

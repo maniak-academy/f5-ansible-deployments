@@ -1,0 +1,35 @@
+# The following playbook generares a CSR 
+
+---
+- name: "The following playbook performs a precheck on the existing environment"
+  hosts: lb
+  gather_facts: false
+  connection: local
+
+  vars_prompt:
+    - name: f5_device
+      prompt: "What F5 device are you connecting to specific the FQQN: "
+      private: no
+
+    - name: backupname
+      prompt: "What is the name of the cert Object example.com_202003.crt: "
+      private: no
+     
+
+  tasks:
+    - name: Setup provider
+      set_fact:
+        provider:
+          server: "{{f5_device}}"
+          user: "{{ansible_user}}"
+          password: "{{ansible_ssh_pass}}"
+          server_port: 443
+          validate_certs: false
+
+    - name: Download a new UCS
+      bigip_ucs_fetch:
+        src: "{{backupname}}"
+        dest: /tmp/"{{backupname}}"
+        provider: "{{provider}}"
+      delegate_to: localhost
+

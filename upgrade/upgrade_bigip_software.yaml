@@ -1,0 +1,64 @@
+---
+- name: Upgrade BIG-IP software
+  hosts: lb
+  gather_facts: False
+  vars:
+    provider:
+      password: "{{ bigip_password }}"
+      server: "{{ ansible_host }}"
+      user: "{{ bigip_username }}"
+      validate_certs: False
+  vars_prompt:
+    - name: version
+      prompt: "Version and build from ISO"
+      private: no
+
+  tasks:
+    - name: Get failover state
+      shell: tmsh show sys failover | awk '{print $2}'
+      register: failover_state
+
+    - block:
+      - name: Verify running configuration of the BIG-IP
+        command: tmsh load sys config verify
+
+      - name: Reactivate BIG-IP with existing reg key
+        shell: SOAPLicenseClient --basekey $(perl -ane 'print $F[3] if /^Registration Key/' /config/bigip.license)
+   
+      - name: Wait for configuration to finish loading
+        wait_for:
+          timeout: 45
+        delegate_to: localhost
+
+      - name: Get current time on BIG-IP
+        command: date "+%H%M%S-%m%d%y"
+        register: date
+
+      - name: Download a new UCS
+        bigip_ucs_fetch:
+          src: "{{ inventory_hostname + '-' + date.stdout +  '-backup.ucs' }}"
+          dest: "{{ 'files/' + inventory_hostname + '-' + date.stdout +  '-backup.ucs' }}"
+          provider: "{{ provider }}"
+        delegate_to: localhost
+
+      - name: Upload image to the BIG-IP
+        bigip_software_image:
+         image: "{{ 'files/BIGIP-' + version  + '.iso' }}"
+         provider: "{{ provider }}"
+        delegate_to: localhost
+
+      - name: Get available volume number to use
+        script: files/get_vol_number.bash
+        register: vol
+
+      - name: Install BIG-IP software
+        bigip_software_install:
+          image: "{{ 'BIGIP-' + version  + '.iso' }}"
+          state: activated
+          volume: "{{ vol.stdout }}"
+          provider: "{{ provider }}"
+        delegate_to: localhost
+        async: 45
+        poll: 0
+      
+      when: failover_state.stdout  == 'standby'

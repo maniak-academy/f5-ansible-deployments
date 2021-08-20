@@ -1,0 +1,57 @@
+# The following playbook generares a CSR 
+
+---
+- name: "Import Cert Management, Validate and Deploy"
+  hosts: lb
+  gather_facts: false
+  connection: local
+
+  vars_prompt:
+    - name: f5_device
+      prompt: "What F5 device are you connecting to specific the FQQN: "
+      private: no
+
+    - name: cert_name
+      prompt: "What is the name of the cert Object example.com_202003.crt: "
+      private: no
+     
+    - name: cert_pem_name
+      prompt: "What is the cert PEM that you have uploaded name: "
+      private: no
+
+    - name: chain_name
+      prompt: "For External type CTC-External.crt for Internal Type CTC-Internal.crt: "
+      private: no
+
+    - name: client_side_profile
+      prompt: "What is the name of the Client Side Profile you are looking to update: "
+      private: no
+
+  tasks:
+    - name: Setup provider
+      set_fact:
+        provider:
+          server: "{{f5_device}}"
+          user: "{{ansible_user}}"
+          password: "{{ansible_ssh_pass}}"
+          server_port: 443
+          validate_certs: false
+
+    - name: Import both key and cert
+      bigip_ssl_certificate:
+        content: "{{ lookup('file', '{{cert_pem_name}}') }}"
+        name: "{{cert_name}}"
+        state: present
+        provider: "{{provider}}"
+      delegate_to: localhost
+
+    - name: Create a client SSL profile with a cert/key/chain setting
+      bigip_profile_client_ssl:
+        state: present
+        provider: "{{provider}}"
+        name: "{{client_side_profile}}"
+        cert_key_chain:
+          - cert: "{{cert_name}}"
+            key: "{{cert_name}}"
+            chain: "{{cert_name}}"
+      delegate_to: localhost

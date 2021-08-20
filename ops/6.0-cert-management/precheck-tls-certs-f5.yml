@@ -1,0 +1,76 @@
+# The following playbook generares a CSR 
+
+---
+- name: "The following playbook performs a precheck on the existing environment"
+  hosts: lb
+  gather_facts: false
+  connection: local
+
+  vars_prompt:
+    - name: f5_device
+      prompt: "What F5 device are you connecting to specific the FQQN: "
+      private: no
+
+    - name: cert_name
+      prompt: "What is the name of the cert Object example.com_202003.crt: "
+      private: no
+     
+
+
+  tasks:
+    - name: Setup provider
+      set_fact:
+        provider:
+          server: "{{f5_device}}"
+          user: "{{ansible_user}}"
+          password: "{{ansible_ssh_pass}}"
+          server_port: 443
+          validate_certs: false
+
+    - name: list system crypto cert
+      bigip_command:
+        commands:
+          - list system crypto cert "{{cert_name}}"
+        provider: "{{provider}}"
+      register: bigip_facts
+      delegate_to: localhost
+
+    - name: "Print output for bigip_facts"
+      debug:
+        var: bigip_facts.stdout_lines
+
+    - name: list ltm profile client-ssl my_profile
+      bigip_command:
+        commands:
+          - list ltm profile client-ssl my_profile
+        provider: "{{provider}}"
+      register: bigip_facts
+      delegate_to: localhost
+
+    - name: "Print output for bigip_facts"
+      debug:
+        var: bigip_facts.stdout_lines
+
+    - name: list ltm profile client-ssl 
+      bigip_command:
+        commands:
+          - list ltm profile client-ssl /*/* cert | grep -B 1 "cert maniak2"
+        provider: "{{provider}}"
+      register: bigip_facts
+      delegate_to: localhost
+
+    - name: "Print output for bigip_facts"
+      debug:
+        var: bigip_facts.stdout_lines
+
+    - name: list ltm profile client-ssl 
+      bigip_command:
+        commands:
+          - list ltm virtual profiles | grep -B 10 "{{ssl_profile}}" | egrep "(virtual|clients)"
+        provider: "{{provider}}"
+      register: bigip_facts
+      delegate_to: localhost
+
+    - name: "Print output for bigip_facts"
+      debug:
+        var: bigip_facts.stdout_lines
