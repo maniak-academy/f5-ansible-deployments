@@ -22,6 +22,6 @@ Which version does it work with
 * Need to add mount -o remount,ro /usr for users that have ilx module deployed after version 13 all the way to 16
 
 ```
-ansible-playbook -i inventory/hosts upgrade_bigip_software.yaml -vvv
+ansible-playbook -i inventory/hosts upgrade_bigip.yaml -vvv
 ```
 
