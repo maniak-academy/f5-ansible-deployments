@@ -29,7 +29,7 @@
             - load sys config verify
           provider: "{{ provider }}" 
   
-      - name: Wait for configuration to finish loading
+      - name: Task 3 - Wait for configuration to finish loading
         wait_for:
           timeout: 45
         delegate_to: localhost
