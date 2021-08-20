@@ -1,6 +1,7 @@
 ---
 - name: Upgrade BIG-IP software
   hosts: lb
+  connection: local
   gather_facts: False
   vars:
     provider:
@@ -15,19 +16,26 @@
 
   tasks:
     - name: Get failover state
-      shell: tmsh show sys failover | awk '{print $2}'
+      bigip_command:
+        commands:
+          - show sys failover
+        provider: "{{ provider }}" 
       register: failover_state
+
+    - name: Display Get failover state
+      debug:
+        var: failover_state.stdout
 
     - block:
       - name: Verify running configuration of the BIG-IP
-        command: tmsh load sys config verify
-
-      - name: Reactivate BIG-IP with existing reg key
-        shell: SOAPLicenseClient --basekey $(perl -ane 'print $F[3] if /^Registration Key/' /config/bigip.license)
-   
+        bigip_command:
+          commands:
+            - load sys config verify
+          provider: "{{ provider }}" 
+  
       - name: Wait for configuration to finish loading
         wait_for:
-          timeout: 45
+          timeout: 3
         delegate_to: localhost
 
       - name: Get current time on BIG-IP
@@ -47,18 +55,29 @@
          provider: "{{ provider }}"
         delegate_to: localhost
 
-      - name: Get available volume number to use
-        script: files/get_vol_number.bash
-        register: vol
-
       - name: Install BIG-IP software
         bigip_software_install:
           image: "{{ 'BIGIP-' + version  + '.iso' }}"
-          state: activated
-          volume: "{{ vol.stdout }}"
+          state: installed
+          volume: "HD1.2"
           provider: "{{ provider }}"
         delegate_to: localhost
         async: 45
         poll: 0
-      
-      when: failover_state.stdout  == 'standby'
+
+      - name: Verify the system was installed
+        bigip_device_info:
+          gather_subset: 
+            - software-volumes
+          provider: "{{ provider }}"
+        register: bigip_software_install
+        tags:
+          - verify
+
+      - name: Displays the device info
+        debug:
+          var: bigip_software_install.software_volumes
+        tags:
+          - verify
+
+      when: failover_state.stdout == "*standby*"

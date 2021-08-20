@@ -1,4 +1,5 @@
 files/BIGIP*
+files/f*
 
 # Local .terraform directories
 **/.terraform/*
