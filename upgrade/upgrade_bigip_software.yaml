@@ -24,7 +24,7 @@
 
     - name: Display Get failover state
       debug:
-        var: failover_state.stdout
+        var: failover_state
 
     - block:
       - name: Verify running configuration of the BIG-IP
@@ -80,4 +80,10 @@
         tags:
           - verify
 
-      when: failover_state.stdout == "*standby*"
+      - name: Copy the config from HD1.1 to HD1.2 cpcfg --source=HD1.1 --reboot HD1.2    
+        raw: curl -u "{{bigip_username}}":"{{bigip_password}}" -k https://"{{ansible_host}}":443/mgmt/tm/util/bash  -H "Content-type:application/json" -d "{\"command\":\"run\",\"utilCmdArgs\":\"-c 'cpcfg --source=HD1.1 --reboot HD1.2'\"}"
+        ignore_errors: True
+        register: cpcfg
+
+
+      when: failover_state.stdout is search("standby")
