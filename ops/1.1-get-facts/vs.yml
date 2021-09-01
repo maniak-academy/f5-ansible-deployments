@@ -22,5 +22,5 @@
         var: device_facts
     - local_action:
         module: copy
-        content: "{{ device_facts.virtual_servers |to_nice_yaml }}"
+        content: "{{ device_facts.virtual_servers | to_nice_yaml }}"
         dest: "output.yml"
