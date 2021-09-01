@@ -2,6 +2,8 @@
 
 The following repo is a collection of Imperative and Declarative Ansiple playbooks. I will continue to deploy more examples in the future
 
+## New Features
+* added ops/1.1-get-facts/vs.yaml: extract all the virutal server properties 
 
 ## Declarative (AS3 NEW WAY)
 

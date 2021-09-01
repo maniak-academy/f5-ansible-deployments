@@ -8,7 +8,7 @@
     - name: COLLECT BIG-IP FACTS
       f5networks.f5_modules.bigip_device_info:
         gather_subset:
-          - system-info
+          - virtual-servers
         provider:
           server: "{{private_ip}}"
           user: "{{ansible_user}}"
@@ -20,11 +20,7 @@
     - name: DISPLAY COMPLETE BIG-IP SYSTEM INFORMATION
       debug:
         var: device_facts
-
-    - name: DISPLAY ONLY THE MAC ADDRESS
-      debug:
-        var: device_facts['system_info']['base_mac_address']
-
-    - name: DISPLAY ONLY THE VERSION
-      debug:
-        var: device_facts['system_info']['product_version']
+    - local_action:
+        module: copy
+        content: "{{ device_facts.virtual_servers |to_nice_yaml }}"
+        dest: "output.yml"

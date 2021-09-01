@@ -1,0 +1,3 @@
+
+[f5]
+bigip.maniak.academy ansible_host=f5 ansible_user=admin private_ip=192.168.86.53 ansible_ssh_pass=W3lcome098!
