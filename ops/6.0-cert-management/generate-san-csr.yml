@@ -29,8 +29,8 @@
       set_fact:
         provider:
           server: "{{f5_device}}"
-          user: "{{ansible_user}}"
-          password: "{{ansible_ssh_pass}}"
+          user: "admin"
+          password: "admin"
           server_port: 443
           validate_certs: false
 

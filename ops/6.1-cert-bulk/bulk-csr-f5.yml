@@ -1,0 +1,39 @@
+# The following playbook generares a CSR 
+
+---
+- name: "TLS Cert Management"
+  hosts: f5
+  gather_facts: false
+  connection: local
+  vars_files:
+    variables.yaml
+
+  vars:
+    provider:
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: 443
+      validate_certs: false
+
+  tasks:
+    - name: Create an SSL csr
+      bigip_command:
+        commands:
+          - create sys crypto csr '{{csr_name}}' common-name '{{csr_name}}' organization "SebbyCorp Wheels Corporation, Limited" city "Toronto" State "ON" Country "CA" subject-alternative-name DNS:'{{ cert_name }}' key default.key email-address "netopslan@canWheels.com"
+        provider: "{{provider}}"
+      delegate_to: localhost
+      args:
+         warn: false
+
+    - name: list
+      bigip_command:
+        commands:
+          - list sys crypto csr abc.com
+        provider: "{{provider}}"
+      register: bigip_facts
+      delegate_to: localhost
+
+    - name: "Print output for bigip_facts"
+      debug:
+        var: bigip_facts.stdout
