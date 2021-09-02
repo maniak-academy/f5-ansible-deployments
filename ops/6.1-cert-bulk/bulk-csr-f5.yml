@@ -17,10 +17,15 @@
       validate_certs: false
 
   tasks:
+    
+    - name: Task 4 - Get current time on BIG-IP
+      command: date "+20%y%m"
+      register: date
+
     - name: Create an SSL csr
       bigip_command:
         commands:
-          - create sys crypto csr '{{item.csr_name }}' common-name '{{item.csr_name}}' organization "SebbyCorp Wheels Corporation, Limited" city "Toronto" State "ON" Country "CA" subject-alternative-name DNS:'{{ item.csr_name }}' key default.key email-address "netopslan@canWheels.com"
+          - create sys crypto csr '{{item.csr_name + '_' + date.stdout }}' common-name '{{item.csr_name}}' organization "SebbyCorp Wheels Corporation, Limited" city "Toronto" State "ON" Country "CA" subject-alternative-name DNS:'{{ item.csr_name }}' key default.key email-address "netopslan@canWheels.com"
         provider: "{{provider}}"
       loop: "{{ csr_name }}"
       delegate_to: localhost

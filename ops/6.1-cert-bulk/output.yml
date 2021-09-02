@@ -4,13 +4,13 @@ results:
 -   ansible_loop_var: item
     changed: false
     executed_commands:
-    - tmsh -c \"list sys crypto csr \'asdfasdfasdf\'\"
+    - tmsh -c \"list sys crypto csr \'aaaaaaaf\'\"
     failed: false
     invocation:
         module_args:
             chdir: null
             commands:
-            - list sys crypto csr 'asdfasdfasdf'
+            - list sys crypto csr 'aaaaaaaf'
             interval: 1
             match: all
             provider:
@@ -28,67 +28,19 @@ results:
             wait_for: null
             warn: true
     item:
-        csr_name: asdfasdfasdf
-    stdout:
-    - "-----BEGIN CERTIFICATE REQUEST-----\nMIIDJDCCAgwCAQAwgZsxCzAJBgNVBAYTAkNBMQswCQYDVQQIEwJPTjEQMA4GA1UE\n\
-        BxMHVG9yb250bzEuMCwGA1UEChMlU2ViYnlDb3JwIFdoZWVscyBDb3Jwb3JhdGlv\nbiwgTGltaXRlZDEVMBMGA1UEAxMMYXNkZmFzZGZhc2RmMSYwJAYJKoZIhvcNAQkB\n\
-        FhduZXRvcHNsYW5AY2FuV2hlZWxzLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEP\nADCCAQoCggEBALFuwtCPN8lxnuSEt5gx1l2VNqppKwRPv8jg4YkqcIN+WMBRFMvj\n\
-        gmrqQK32s5P9QOykr7wjLYOlCxJZ4MjhnQTmhxF2qbcEThlrPJLChkMLqlKjgc9H\nMOymDQCAvU1gwj1UA7CUNdphcAtSb4uOmmQx4IIIWgB/n5Pkje/liGTId56BNnJa\n\
-        m7tMey/z6z9ZQcLd3DPyx8l7D7hbVBA9FY2+u16TbHuSYTPCHLQGEvDgSE1YTdn4\nIeWvTnxtlKg1hQXFM8n7UZnVsybb8HXQ99Ck/6RQbd7ay3Y3BrjilRs6vjl+gGi6\n\
-        sZBbDgXxWMLAjIF6YE6AGIUKZSStqVLTUIcCAwEAAaBDMEEGCSqGSIb3DQEJDjE0\nMDIwMAYDVR0RBCkwJ4IMYXNkZmFzZGZhc2RmgRduZXRvcHNsYW5AY2FuV2hlZWxz\n\
-        LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAj5iNlsb/tRvAkU7+vKHnh6FegmjtO5Ok\nmFfvnWP/QcZKAXb5eGdjKUO/s0D1LxWm4mly1ijIP2YSsCZ9dvgpTVQ+alzo9sFu\n\
-        UEg6vND+kP+Wbm08MNdBSwuEcmp8ysu8be8M+ecXx7IS4nPVKA+nRqIHgplvvr++\nAe8hn7ybC1jMXman06ZuG+kF2rdfgEu2si8pLNAYfygUCUf0iiowEZvdz8t+i2rf\n\
-        aLFYAP/2qFtXEOJdZloh9q2gg2OZR4T+Y4mWdoJpv/UmrrlmBcgon0mWzNvkyAvA\nFaYpPXq+eShR+Sn+3S+jnIZ8B2kLZRvR5cCahnQpDGqXOqsNQg3kVg==\n\
-        -----END CERTIFICATE REQUEST-----\nsys crypto csr asdfasdfasdf {\n    admin-email-address\n\
-        \    challenge-password\n    city Toronto\n    common-name asdfasdfasdf\n\
-        \    country CA\n    email-address netopslan@canWheels.com\n    key-size 2048\n\
-        \    organization SebbyCorp Wheels Corporation, Limited\n    ou\n    public-key-type\
-        \ RSA\n    state ON\n    subject-alternative-name DNS:asdfasdfasdf, email:netopslan@canWheels.com\n\
-        }"
-    stdout_lines:
-    -   - '-----BEGIN CERTIFICATE REQUEST-----'
-        - MIIDJDCCAgwCAQAwgZsxCzAJBgNVBAYTAkNBMQswCQYDVQQIEwJPTjEQMA4GA1UE
-        - BxMHVG9yb250bzEuMCwGA1UEChMlU2ViYnlDb3JwIFdoZWVscyBDb3Jwb3JhdGlv
-        - biwgTGltaXRlZDEVMBMGA1UEAxMMYXNkZmFzZGZhc2RmMSYwJAYJKoZIhvcNAQkB
-        - FhduZXRvcHNsYW5AY2FuV2hlZWxzLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEP
-        - ADCCAQoCggEBALFuwtCPN8lxnuSEt5gx1l2VNqppKwRPv8jg4YkqcIN+WMBRFMvj
-        - gmrqQK32s5P9QOykr7wjLYOlCxJZ4MjhnQTmhxF2qbcEThlrPJLChkMLqlKjgc9H
-        - MOymDQCAvU1gwj1UA7CUNdphcAtSb4uOmmQx4IIIWgB/n5Pkje/liGTId56BNnJa
-        - m7tMey/z6z9ZQcLd3DPyx8l7D7hbVBA9FY2+u16TbHuSYTPCHLQGEvDgSE1YTdn4
-        - IeWvTnxtlKg1hQXFM8n7UZnVsybb8HXQ99Ck/6RQbd7ay3Y3BrjilRs6vjl+gGi6
-        - sZBbDgXxWMLAjIF6YE6AGIUKZSStqVLTUIcCAwEAAaBDMEEGCSqGSIb3DQEJDjE0
-        - MDIwMAYDVR0RBCkwJ4IMYXNkZmFzZGZhc2RmgRduZXRvcHNsYW5AY2FuV2hlZWxz
-        - LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAj5iNlsb/tRvAkU7+vKHnh6FegmjtO5Ok
-        - mFfvnWP/QcZKAXb5eGdjKUO/s0D1LxWm4mly1ijIP2YSsCZ9dvgpTVQ+alzo9sFu
-        - UEg6vND+kP+Wbm08MNdBSwuEcmp8ysu8be8M+ecXx7IS4nPVKA+nRqIHgplvvr++
-        - Ae8hn7ybC1jMXman06ZuG+kF2rdfgEu2si8pLNAYfygUCUf0iiowEZvdz8t+i2rf
-        - aLFYAP/2qFtXEOJdZloh9q2gg2OZR4T+Y4mWdoJpv/UmrrlmBcgon0mWzNvkyAvA
-        - FaYpPXq+eShR+Sn+3S+jnIZ8B2kLZRvR5cCahnQpDGqXOqsNQg3kVg==
-        - '-----END CERTIFICATE REQUEST-----'
-        - sys crypto csr asdfasdfasdf {
-        - '    admin-email-address'
-        - '    challenge-password'
-        - '    city Toronto'
-        - '    common-name asdfasdfasdf'
-        - '    country CA'
-        - '    email-address netopslan@canWheels.com'
-        - '    key-size 2048'
-        - '    organization SebbyCorp Wheels Corporation, Limited'
-        - '    ou'
-        - '    public-key-type RSA'
-        - '    state ON'
-        - '    subject-alternative-name DNS:asdfasdfasdf, email:netopslan@canWheels.com'
-        - '}'
+        csr_name: aaaaaaaf
+    stdout: []
+    stdout_lines: []
 -   ansible_loop_var: item
     changed: false
     executed_commands:
-    - tmsh -c \"list sys crypto csr \'zzzfasdfasdf333f\'\"
+    - tmsh -c \"list sys crypto csr \'bbbbbbbbbbbb\'\"
     failed: false
     invocation:
         module_args:
             chdir: null
             commands:
-            - list sys crypto csr 'zzzfasdfasdf333f'
+            - list sys crypto csr 'bbbbbbbbbbbb'
             interval: 1
             match: all
             provider:
@@ -106,54 +58,6 @@ results:
             wait_for: null
             warn: true
     item:
-        csr_name: zzzfasdfasdf333f
-    stdout:
-    - "-----BEGIN CERTIFICATE REQUEST-----\nMIIDLDCCAhQCAQAwgZ8xCzAJBgNVBAYTAkNBMQswCQYDVQQIEwJPTjEQMA4GA1UE\n\
-        BxMHVG9yb250bzEuMCwGA1UEChMlU2ViYnlDb3JwIFdoZWVscyBDb3Jwb3JhdGlv\nbiwgTGltaXRlZDEZMBcGA1UEAxMQenp6ZmFzZGZhc2RmMzMzZjEmMCQGCSqGSIb3\n\
-        DQEJARYXbmV0b3BzbGFuQGNhbldoZWVscy5jb20wggEiMA0GCSqGSIb3DQEBAQUA\nA4IBDwAwggEKAoIBAQCxbsLQjzfJcZ7khLeYMdZdlTaqaSsET7/I4OGJKnCDfljA\n\
-        URTL44Jq6kCt9rOT/UDspK+8Iy2DpQsSWeDI4Z0E5ocRdqm3BE4ZazySwoZDC6pS\no4HPRzDspg0AgL1NYMI9VAOwlDXaYXALUm+LjppkMeCCCFoAf5+T5I3v5YhkyHee\n\
-        gTZyWpu7THsv8+s/WUHC3dwz8sfJew+4W1QQPRWNvrtek2x7kmEzwhy0BhLw4EhN\nWE3Z+CHlr058bZSoNYUFxTPJ+1GZ1bMm2/B10PfQpP+kUG3e2st2Nwa44pUbOr45\n\
-        foBourGQWw4F8VjCwIyBemBOgBiFCmUkralS01CHAgMBAAGgRzBFBgkqhkiG9w0B\nCQ4xODA2MDQGA1UdEQQtMCuCEHp6emZhc2RmYXNkZjMzM2aBF25ldG9wc2xhbkBj\n\
-        YW5XaGVlbHMuY29tMA0GCSqGSIb3DQEBCwUAA4IBAQB9UuiA4zEEGSCu2wom7KIt\nSRop8yxc2ojWb+usY30FfO/AG6vb0CrGVlFDPViqeV+fgpWjk+ZG2K0vefpMmnpv\n\
-        2nr6n7mf+zYZU0Em0vZ0YWYgeZ/Baa8AGpwPZb4RRR+l/xK5hpxd+zdC2ltjblL2\nehgvQx52atYpzGbHOR402ewuYaRQ9PIgyKy44uQ1YB8YclPkmvQDn506jH3em8uU\n\
-        nHv0sXBzjVEts9CFtbCeWwv0YWW9j/OKmaM6+Q9/mXptdYztqXxNOqm5gmLNL4BC\n0H4xp4QWkju/FeX5AEUCKJv+2FHeJ1AkTSloRj7l2N4aQvW6PYkH+zmbO6U80ogz\n\
-        -----END CERTIFICATE REQUEST-----\nsys crypto csr zzzfasdfasdf333f {\n   \
-        \ admin-email-address\n    challenge-password\n    city Toronto\n    common-name\
-        \ zzzfasdfasdf333f\n    country CA\n    email-address netopslan@canWheels.com\n\
-        \    key-size 2048\n    organization SebbyCorp Wheels Corporation, Limited\n\
-        \    ou\n    public-key-type RSA\n    state ON\n    subject-alternative-name\
-        \ DNS:zzzfasdfasdf333f, email:netopslan@canWheels.com\n}"
-    stdout_lines:
-    -   - '-----BEGIN CERTIFICATE REQUEST-----'
-        - MIIDLDCCAhQCAQAwgZ8xCzAJBgNVBAYTAkNBMQswCQYDVQQIEwJPTjEQMA4GA1UE
-        - BxMHVG9yb250bzEuMCwGA1UEChMlU2ViYnlDb3JwIFdoZWVscyBDb3Jwb3JhdGlv
-        - biwgTGltaXRlZDEZMBcGA1UEAxMQenp6ZmFzZGZhc2RmMzMzZjEmMCQGCSqGSIb3
-        - DQEJARYXbmV0b3BzbGFuQGNhbldoZWVscy5jb20wggEiMA0GCSqGSIb3DQEBAQUA
-        - A4IBDwAwggEKAoIBAQCxbsLQjzfJcZ7khLeYMdZdlTaqaSsET7/I4OGJKnCDfljA
-        - URTL44Jq6kCt9rOT/UDspK+8Iy2DpQsSWeDI4Z0E5ocRdqm3BE4ZazySwoZDC6pS
-        - o4HPRzDspg0AgL1NYMI9VAOwlDXaYXALUm+LjppkMeCCCFoAf5+T5I3v5YhkyHee
-        - gTZyWpu7THsv8+s/WUHC3dwz8sfJew+4W1QQPRWNvrtek2x7kmEzwhy0BhLw4EhN
-        - WE3Z+CHlr058bZSoNYUFxTPJ+1GZ1bMm2/B10PfQpP+kUG3e2st2Nwa44pUbOr45
-        - foBourGQWw4F8VjCwIyBemBOgBiFCmUkralS01CHAgMBAAGgRzBFBgkqhkiG9w0B
-        - CQ4xODA2MDQGA1UdEQQtMCuCEHp6emZhc2RmYXNkZjMzM2aBF25ldG9wc2xhbkBj
-        - YW5XaGVlbHMuY29tMA0GCSqGSIb3DQEBCwUAA4IBAQB9UuiA4zEEGSCu2wom7KIt
-        - SRop8yxc2ojWb+usY30FfO/AG6vb0CrGVlFDPViqeV+fgpWjk+ZG2K0vefpMmnpv
-        - 2nr6n7mf+zYZU0Em0vZ0YWYgeZ/Baa8AGpwPZb4RRR+l/xK5hpxd+zdC2ltjblL2
-        - ehgvQx52atYpzGbHOR402ewuYaRQ9PIgyKy44uQ1YB8YclPkmvQDn506jH3em8uU
-        - nHv0sXBzjVEts9CFtbCeWwv0YWW9j/OKmaM6+Q9/mXptdYztqXxNOqm5gmLNL4BC
-        - 0H4xp4QWkju/FeX5AEUCKJv+2FHeJ1AkTSloRj7l2N4aQvW6PYkH+zmbO6U80ogz
-        - '-----END CERTIFICATE REQUEST-----'
-        - sys crypto csr zzzfasdfasdf333f {
-        - '    admin-email-address'
-        - '    challenge-password'
-        - '    city Toronto'
-        - '    common-name zzzfasdfasdf333f'
-        - '    country CA'
-        - '    email-address netopslan@canWheels.com'
-        - '    key-size 2048'
-        - '    organization SebbyCorp Wheels Corporation, Limited'
-        - '    ou'
-        - '    public-key-type RSA'
-        - '    state ON'
-        - '    subject-alternative-name DNS:zzzfasdfasdf333f, email:netopslan@canWheels.com'
-        - '}'
+        csr_name: bbbbbbbbbbbb
+    stdout: []
+    stdout_lines: []
