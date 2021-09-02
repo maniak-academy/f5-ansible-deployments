@@ -20,8 +20,9 @@
     - name: Create an SSL csr
       bigip_command:
         commands:
-          - create sys crypto csr '{{csr_name}}' common-name '{{csr_name}}' organization "SebbyCorp Wheels Corporation, Limited" city "Toronto" State "ON" Country "CA" subject-alternative-name DNS:'{{ cert_name }}' key default.key email-address "netopslan@canWheels.com"
+          - create sys crypto csr '{{item.csr_name }}' common-name '{{item.csr_name}}' organization "SebbyCorp Wheels Corporation, Limited" city "Toronto" State "ON" Country "CA" subject-alternative-name DNS:'{{ item.csr_name }}' key default.key email-address "netopslan@canWheels.com"
         provider: "{{provider}}"
+      loop: "{{ csr_name }}"
       delegate_to: localhost
       args:
          warn: false
@@ -29,11 +30,20 @@
     - name: list
       bigip_command:
         commands:
-          - list sys crypto csr abc.com
+          - list sys crypto csr '{{ item.csr_name }}'
         provider: "{{provider}}"
+      loop: "{{ csr_name }}"
       register: bigip_facts
       delegate_to: localhost
 
     - name: "Print output for bigip_facts"
       debug:
-        var: bigip_facts.stdout
+        var: bigip_facts
+
+    - name: DISPLAY COMPLETE BIG-IP SYSTEM INFORMATION
+      debug:
+        var: device_facts
+    - local_action:
+        module: copy
+        content: "{{ bigip_facts | to_nice_yaml }}"
+        dest: "output.yml"
