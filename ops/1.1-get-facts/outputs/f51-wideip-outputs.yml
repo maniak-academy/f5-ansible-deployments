@@ -1,0 +1,52 @@
+ansible_facts:
+    ansible_net_gtm_a_wide_ips:
+    -   enabled: 'yes'
+        failure_rcode: noerror
+        failure_rcode_response: 'no'
+        failure_rcode_ttl: 0
+        full_path: /Common/website.maniak.academy
+        last_resort_pool: ''
+        minimal_response: enabled
+        name: website.maniak.academy
+        persist_cidr_ipv4: 32
+        persist_cidr_ipv6: 128
+        pool_lb_mode: round-robin
+        pools:
+        -   name: website_pool
+            order: 0
+            partition: Common
+            ratio: 1
+        ttl_persistence: 3600
+    ansible_net_gtm_aaaa_wide_ips: []
+    ansible_net_gtm_cname_wide_ips: []
+    ansible_net_gtm_mx_wide_ips: []
+    ansible_net_gtm_naptr_wide_ips: []
+    ansible_net_gtm_srv_wide_ips: []
+    ansible_net_queried: true
+    discovered_interpreter_python: /usr/bin/python3
+changed: false
+failed: false
+gtm_a_wide_ips:
+-   enabled: 'yes'
+    failure_rcode: noerror
+    failure_rcode_response: 'no'
+    failure_rcode_ttl: 0
+    full_path: /Common/website.maniak.academy
+    last_resort_pool: ''
+    minimal_response: enabled
+    name: website.maniak.academy
+    persist_cidr_ipv4: 32
+    persist_cidr_ipv6: 128
+    pool_lb_mode: round-robin
+    pools:
+    -   name: website_pool
+        order: 0
+        partition: Common
+        ratio: 1
+    ttl_persistence: 3600
+gtm_aaaa_wide_ips: []
+gtm_cname_wide_ips: []
+gtm_mx_wide_ips: []
+gtm_naptr_wide_ips: []
+gtm_srv_wide_ips: []
+queried: true
