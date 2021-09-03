@@ -1,0 +1,31 @@
+---
+- name: GRAB F5 FACTS
+  hosts: f5
+  connection: local
+  gather_facts: false
+
+  vars_prompt:
+    - name: gather_command
+      prompt: What is the node name?
+      private: no
+
+  tasks:
+    - name: Extracts all device information
+      f5networks.f5_modules.bigip_device_info:
+        gather_subset:
+          - "{{gather_command}}"
+        provider:
+          server: "{{private_ip}}"
+          user: "{{ansible_user}}"
+          password: "{{ansible_password}}"
+          server_port: 443
+          validate_certs: false
+      register: device_facts
+
+    - name: DISPLAY COMPLETE BIG-IP SYSTEM INFORMATION
+      debug:
+        var: device_facts
+    - local_action:
+        module: copy
+        content: "{{ device_facts | to_nice_yaml }}"
+        dest: outputs/{{ansible_host}}-{{gather_command}}.yml

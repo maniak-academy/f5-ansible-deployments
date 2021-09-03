@@ -1,0 +1,8 @@
+ansible_facts:
+    ansible_net_queried: true
+    ansible_net_remote_syslog: {}
+    discovered_interpreter_python: /usr/bin/python3
+changed: false
+failed: false
+queried: true
+remote_syslog: {}
