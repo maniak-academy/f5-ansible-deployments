@@ -5,10 +5,10 @@
   gather_facts: false
 
   tasks:
-    - name: COLLECT BIG-IP FACTS
+    - name: Extracts all device information
       f5networks.f5_modules.bigip_device_info:
         gather_subset:
-          - virtual-servers
+          - vcmp-guests
         provider:
           server: "{{private_ip}}"
           user: "{{ansible_user}}"
@@ -22,5 +22,5 @@
         var: device_facts
     - local_action:
         module: copy
-        content: "{{ device_facts.virtual_servers | to_nice_yaml }}"
-        dest: "output.yml"
+        content: "{{ device_facts | to_nice_yaml }}"
+        dest: outputs/{{ansible_host}}-vcmp-guests-output.yml

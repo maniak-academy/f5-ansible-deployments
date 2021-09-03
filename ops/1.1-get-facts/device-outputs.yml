@@ -5,7 +5,7 @@
   gather_facts: false
 
   tasks:
-    - name: COLLECT BIG-IP FACTS
+    - name: Extracts all device information
       f5networks.f5_modules.bigip_device_info:
         gather_subset:
           - devices
@@ -23,4 +23,4 @@
     - local_action:
         module: copy
         content: "{{ device_facts | to_nice_yaml }}"
-        dest: "all-output.yml"
+        dest: outputs/{{ansible_host}}-device-output.yml
