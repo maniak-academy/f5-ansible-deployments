@@ -4,6 +4,7 @@
 import getpass
 import os
 import hashlib
+import csv
 
 # Internal imports
 # Import only with "from x import y", to simplify the code.
@@ -14,9 +15,8 @@ from bigrest.utils.utils import token
 device = BIGIP("192.168.86.57", "admin", "W3lcome098!")
 
 virtuals = device.load("/mgmt/tm/ltm/virtual")
+
+
 for virtual in virtuals:
     print(virtual.properties["name"])
-    print(virtual.properties["partition"])
-    print(virtual.properties["fullPath"])
-    print(virtual.properties["destination"])
-    print(virtual.properties["pool"])
+    print("Partition:" + virtual.properties["partition"])

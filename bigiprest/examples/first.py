@@ -1,279 +1,151 @@
-"""
-BIGREST SDK tests
-Perform test on a BIG-IP device
-"""
+# ----------------
+# Copyright
+# ----------------
+# Written by John Capobianco, March 2021
+# Copyright (c) 2021 John Capobianco
 
-# External Imports
-# Import only with "import package",
-# it will make explicity in the code where it came from.
-import getpass
+# ----------------
+# Python
+# ----------------
 import os
-import hashlib
+import sys
+import yaml
+import time
+import json
+import shutil
+import logging
+import requests
+from rich import print
+from rich.panel import Panel
+from rich.text import Text
+from pyats import aetest
+from pyats.log.utils import banner
+from jinja2 import Environment, FileSystemLoader
+#from ascii_art import GREETING, LEARN, RUNNING, WRITING, FINISHED
 
-# Internal imports
-# Import only with "from x import y", to simplify the code.
-from ..bigrest.bigip import BIGIP
-from ..bigrest.utils.utils import rest_format
-from ..bigrest.utils.utils import token
+# ----------------
+# Get logger for script
+# ----------------
 
-# Get username, password, and ip
-print("Username: ", end="")
-username = input()
-password = getpass.getpass()
-print("Device IP or name: ", end="")
-ip = input()
+log = logging.getLogger(__name__)
 
-# Create a device object with basic authentication
-device = BIGIP("192.168.86.57","admin","W3lcome098!")
+# ----------------
+# Filetypes 
+# ----------------
 
-# Objects list
-pool_name = "/bigrest/bigrest_pool"
-node_name = "/bigrest/172.17.0.1"
-member_name = "/bigrest/172.17.0.1:80"
-partition_name = "/bigrest"
-virtual_name = "/bigrest/bigrest_vs"
-virtual_name2 = "/bigrest/bigrest_vs2"
-pool_name2 = "/bigrest/bigrest_pool2"
-virtual_name3 = "/bigrest/bigrest_vs3"
-pool_name3 = "/bigrest/bigrest_pool3"
-scf_name = "bigrest.scf"
-filename = "bigrest.iso"
+filetype_loop = ["csv","md","html"]
 
-# Create folder
-data = {}
-data["name"] = "bigrest"
-data["partition"] = "/"
-partition = device.create("/mgmt/tm/sys/folder", data)
-if partition.properties["fullPath"] != partition_name:
-    raise Exception(partition.properties["fullPath"])
-else:
-    print(f"Partition {partition_name} created.")
+# ----------------
+# Template Directory
+# ----------------
 
-# Create pool
-data = {}
-data["name"] = pool_name
-pool = device.create("/mgmt/tm/ltm/pool", data)
-if pool.properties["fullPath"] != pool_name:
-    raise Exception(pool.properties["fullPath"])
-else:
-    print(f"Pool {pool_name} created.")
+template_dir = 'templates/f5'
+env = Environment(loader=FileSystemLoader(template_dir))
 
-# Add pool member
-data = {}
-data["name"] = member_name
-member = device.create(
-    f"/mgmt/tm/ltm/pool/{rest_format(pool_name)}/members", data)
-if member.properties["fullPath"] != "/bigrest/172.17.0.1:80":
-    raise Exception(member.properties["fullPath"])
-else:
-    print(f"Member {member_name} created.")
+# ----------------
+# Load Credentials 
+# ----------------
 
-# Add virtual server
-data = {}
-data["name"] = virtual_name
-data["destination"] = "10.17.0.1%0:80"
-virtual = device.create("/mgmt/tm/ltm/virtual", data)
-if virtual.properties["fullPath"] != virtual_name:
-    raise Exception(virtual.properties["fullPath"])
-else:
-    print(f"Virtual {virtual_name} created.")
+with open("testbed/testbed_f5.yaml") as stream:
+    testbed = yaml.safe_load(stream)
 
-# Add pool to virtual server
-virtual = device.load(
-    f"/mgmt/tm/ltm/virtual/{rest_format(virtual_name)}")
-virtual.properties["pool"] = pool_name
-virtual_updated = device.save(virtual)
-if virtual_updated.properties["pool"] != pool_name:
-    raise Exception(virtual_updated.properties["pool_name"])
-else:
-    print(f"Virtual {virtual_name} modified.")
+# ---------------------------------------
+# API Get Token
+# ---------------------------------------
 
-# Print virtual servers name
-virtuals = device.load("/mgmt/tm/ltm/virtual")
-print("List all virtual servers:")
-for virtual in virtuals:
-    print(virtual.properties["name"])
+for device,value in testbed['devices'].items():
+    api_username = testbed["devices"][device]["credentials"]["default"]["username"]
+    api_password = testbed["devices"][device]["credentials"]["default"]["password"]
+    device_alias = testbed["devices"][device]["alias"]
+    f5_token_raw = requests.post("https://%s/mgmt/shared/authn/login" % device, json={"username":"%s" % api_username, "password": "%s" % api_password,"loginprovidername": "tmos"}, verify=False)
+    f5_token_json = f5_token_raw.json()
+    f5_usable_token = f5_token_json["token"]["token"]
 
-# Print node
-node = device.load(f"/mgmt/tm/ltm/node/{rest_format(node_name)}")
-print("Print node:")
-print(node)
+headers={"X-F5-Auth-Token":f5_usable_token}
 
-# Print node example
-node = device.example(f"/mgmt/tm/ltm/node")
-print("Print node example:")
-print(node)
+# ----------------
+# AE Test Setup
+# ----------------
+class common_setup(aetest.CommonSetup):
+    """Common Setup section"""
+    @aetest.subsection
+    def connect_to_devices(self):
+        """Connect to all the devices"""
+        print(Panel.fit(Text.from_markup(GREETING)))
 
-# Modify pool description
-data = {}
-description = "bigrest"
-data["description"] = description
-pool_updated = device.modify(
-    f"/mgmt/tm/ltm/pool/{rest_format(pool_name)}", data)
-if pool_updated.properties["description"] != description:
-    raise Exception(pool_updated.properties["description"])
-else:
-    print(f"Pool {virtual_name} modified.")
+# ----------------
+# Test Case #1 - Go to F5 API
+# ----------------
+class Collect_Information(aetest.Testcase):
+    """Parse all the commands"""
 
-# Test if virtual server exists
-if device.exist(f"/mgmt/tm/ltm/virtual/{rest_format(virtual_name)}"):
-    print(f"Virtual {virtual_name} exists.")
-else:
-    raise Exception(f"Error testing if {virtual_name} exists.")
-fake_virtual_name = "/Common/fake"
-if device.exist(f"/mgmt/tm/ltm/virtual/{rest_format(fake_virtual_name)}"):
-    raise Exception(f"Error testing if {fake_virtual_name} exists.")
-else:
-    print(f"Virtual {fake_virtual_name} does not exist.")
+    @aetest.test
+    def parse(self, section, steps):
+        """ Testcase Setup section """
+        for device in testbed['devices']:
+            print(Panel.fit(Text.from_markup(RUNNING)))
 
-# Show virtual server information
-virtual = device.show(
-    f"/mgmt/tm/ltm/virtual/{rest_format(virtual_name)}")
-max_conns = virtual.properties["clientside.maxConns"]["value"]
-if max_conns != 0:
-    raise Exception(max_conns)
-else:
-    print(f"Virtual {virtual_name} maximum number of connections.")
+            # VS
+            with steps.start('Requesting VS API Information',continue_=True) as step:
+                try:
+                    self.raw_vs = requests.get("https://%s/mgmt/tm/ltm/virtual" % device_alias, headers=headers, verify=False)
+                    print(Panel.fit(Text.from_markup(CLOUD)))
+                except Exception as e:
+                    step.failed('There was a problem with the API\n{e}'.format(e=e))
 
-# Test transaction
-transaction_create = device.transaction_create()
-transaction_id = transaction_create.properties["transId"]
-print(f"Transaction ID: {transaction_id}.")
-data = {}
-data["name"] = pool_name2
-device.create("/mgmt/tm/ltm/pool", data)
-data = {}
-data["name"] = virtual_name2
-data["destination"] = "10.17.0.2%0:80"
-device.create("/mgmt/tm/ltm/virtual", data)
-device.transaction_validate()
-device.transaction_commit()
-print(f"Transaction {transaction_id} completed.")
+            with steps.start('Requesting SSL API Information',continue_=True) as step:
+                try:
+                    self.raw_ssl_cert = requests.get("https://%s/mgmt/tm/sys/file/ssl-cert" % device_alias, headers=headers, verify=False)
+                    print(Panel.fit(Text.from_markup(CLOUD)))
+                except Exception as e:
+                    step.failed('There was a problem with the API\n{e}'.format(e=e))
 
-# Test transaction with "with"
-with device as transaction:
-    data = {}
-    data["name"] = pool_name3
-    device.create("/mgmt/tm/ltm/pool", data)
-    data = {}
-    data["name"] = virtual_name3
-    data["destination"] = "10.17.0.3%0:80"
-    device.create("/mgmt/tm/ltm/virtual", data)
-print('Transaction with "with" completed.')
+            # ---------------------------------------
+            # Generate CSV / MD / HTML / Mind Maps
+            # ---------------------------------------
 
-# Test transaction functions
-transaction_create = device.transaction_create()
-transaction_id = transaction_create.properties["transId"]
-print(f"Transaction ID: {transaction_id}.")
-data = {}
-data["name"] = pool_name2
-device.create("/mgmt/tm/ltm/pool", data)
-data = {}
-data["name"] = virtual_name2
-data["destination"] = "10.17.0.2%0:80"
-device.create("/mgmt/tm/ltm/virtual", data)
-try:
-    device.transaction_validate()
-    raise Exception("Transaction should have failed.")
-except Exception:
-    print("Transaction validated.")
+            with steps.start('Store data',continue_=True) as step:
+                print(Panel.fit(Text.from_markup(WRITING)))
+                
+                # VS
+                if hasattr(self, 'raw_vs'):
+                    self.vs_json = self.raw_vs.json()
+                    vs_template = env.get_template('virtual_servers.j2')
 
-# Test command
-data = {}
-data["command"] = "run"
-data["utilCmdArgs"] = "-c 'cat /VERSION'"
-result = device.command("/mgmt/tm/util/bash", data)
-if "BIG-IP" in result:
-    print("Bash command tested.")
-else:
-    raise Exception(result)
+                    with open("Camelot/F5/Virtual_Servers/%s_virtual_servers.json" % device_alias, "w") as fid:
+                        json.dump(self.vs_json, fid, indent=4, sort_keys=True)
 
-# Test task
-data = {}
-data["command"] = "save"
-task = device.task_start("/mgmt/tm/task/sys/config", data)
-device.task_wait(task)
-if device.task_completed(task):
-    device.task_result(task)
-    print("Task test completed.")
-else:
-    raise Exception()
+                    with open("Camelot/F5/Virtual_Servers/%s_virtual_servers.yaml" % device_alias, "w") as yml:
+                        yaml.dump(self.vs_json, yml, allow_unicode=True)
 
-# Test upload and download
-with open(filename, "wb") as file_:
-    file_.write(os.urandom(10485760))
-with open(filename, "rb") as file_:
-    file_hash = hashlib.md5()
-    file_hash.update(file_.read())
-    md5_original = file_hash.hexdigest()
-device.upload(
-    "/mgmt/cm/autodeploy/software-image-uploads", filename=filename)
-os.remove(filename)
-device.download(
-    f"/mgmt/cm/autodeploy/software-image-downloads", filename=filename)
-with open(filename, "rb") as file_:
-    file_hash = hashlib.md5()
-    file_hash.update(file_.read())
-    md5_new = file_hash.hexdigest()
-if md5_original == md5_new:
-    print("Upload and download tests completed.")
-else:
-    raise Exception("Different md5s.")
+                    for filetype in filetype_loop:
+                        parsed_output_vs = vs_template.render(to_parse_vs=self.vs_json['items'],filetype_loop_jinja2=filetype)
 
-# Create a device object with basic authentication and request_token
-device = BIGIP(ip, username, password, request_token=True)
+                        with open("Camelot/F5/Virtual_Servers/%s_virtual_servers.%s" % (device_alias,filetype), "w") as fh:
+                            fh.write(parsed_output_vs) 
+                    
+                        os.system("markmap Camelot/F5/Virtual_Servers/%s_virtual_servers.md --output Camelot/F5/Virtual_Servers/%s_virtual_servers_mind_map.html" % (device_alias,device_alias))
 
-# Create a device object to use token
-token_ = token(ip, username, password)
-device = BIGIP(ip, token=token_)
+                # SSL Certificates
+                if hasattr(self, 'raw_ssl_cert'):
+                    self.ssl_cert_json = self.raw_ssl_cert.json()
+                    ssl_cert_template = env.get_template('ssl_certificates.j2')
 
-# Delete pool member
-path = (
-    f"/mgmt/tm/ltm/pool/{rest_format(pool_name)}"
-    f"/members/{rest_format(member_name)}"
-)
-device.delete(path)
-print(f"Member {member_name} deleted.")
+                    with open("Camelot/F5/SSL_Certificates/%s_ssl_certificates.json" % device_alias, "w") as fid:
+                        json.dump(self.ssl_cert_json, fid, indent=4, sort_keys=True)
 
-# Delete node
-device.delete(f"/mgmt/tm/ltm/node/{rest_format(node_name)}")
-print(f"Node {node_name} deleted.")
+                    with open("Camelot/F5/SSL_Certificates/%s_ssl_certificates.yaml" % device_alias, "w") as yml:
+                        yaml.dump(self.ssl_cert_json, yml, allow_unicode=True)
 
-# Delete virtual
-device.delete(f"/mgmt/tm/ltm/virtual/{rest_format(virtual_name)}")
-print(f"Virtual {virtual_name} deleted.")
+                    for filetype in filetype_loop:
+                        parsed_output_ssl_cert = ssl_cert_template.render(to_parse_ssl_cert=self.ssl_cert_json['items'],filetype_loop_jinja2=filetype)
 
-# Delete virtual
-device.delete(f"/mgmt/tm/ltm/virtual/{rest_format(virtual_name2)}")
-print(f"Virtual {virtual_name2} deleted.")
+                        with open("Camelot/F5/SSL_Certificates/%s_ssl_certificates.%s" % (device_alias,filetype), "w") as fh:
+                            fh.write(parsed_output_ssl_cert) 
+                    
+                        os.system("markmap Camelot/F5/SSL_Certificates/%s_ssl_certificates.md --output Camelot/F5/SSL_Certificates/%s_ssl_certificates_mind_map.html" % (device_alias,device_alias))
 
-# Delete virtual
-device.delete(f"/mgmt/tm/ltm/virtual/{rest_format(virtual_name3)}")
-print(f"Virtual {virtual_name3} deleted.")
-
-# Delete pool
-device.delete(f"/mgmt/tm/ltm/pool/{rest_format(pool_name)}")
-print(f"Pool {pool_name} deleted.")
-
-# Delete pool
-device.delete(f"/mgmt/tm/ltm/pool/{rest_format(pool_name2)}")
-print(f"Pool {pool_name2} deleted.")
-
-# Delete pool
-device.delete(f"/mgmt/tm/ltm/pool/{rest_format(pool_name3)}")
-print(f"Pool {pool_name3} deleted.")
-
-# Delete partition
-device.delete(f"/mgmt/tm/sys/folder/{rest_format(partition_name)}")
-print(f"Partition {partition_name} deleted.")
-
-# Remove local file
-os.remove(filename)
-print(f"Local file {filename} deleted.")
-
-# Remove remote file
-data = {}
-data["command"] = "run"
-data["utilCmdArgs"] = f"-c 'rm -I /shared/images/{filename}'"
-device.command("/mgmt/tm/util/bash", data)
-print(f"Remote file {filename} deleted.")
+        # ---------------------------------------
+        # You Made It 
+        # ---------------------------------------
+        print(Panel.fit(Text.from_markup(FINISHED)))    
