@@ -16,7 +16,7 @@ device = BIGIP("192.168.86.57", "admin", "W3lcome098!")
 
 virtuals = device.load("/mgmt/tm/ltm/virtual")
 
-
 for virtual in virtuals:
     print(virtual.properties["name"])
+    print(virtual.properties["addressStatus"])
     print("Partition:" + virtual.properties["partition"])
