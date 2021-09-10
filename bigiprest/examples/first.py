@@ -21,7 +21,7 @@ from rich.text import Text
 from pyats import aetest
 from pyats.log.utils import banner
 from jinja2 import Environment, FileSystemLoader
-#from ascii_art import GREETING, LEARN, RUNNING, WRITING, FINISHED
+from ascii_art import GREETING, LEARN, RUNNING, WRITING, FINISHED
 
 # ----------------
 # Get logger for script

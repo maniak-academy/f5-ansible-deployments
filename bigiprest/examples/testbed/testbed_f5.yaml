@@ -1,10 +1,10 @@
 devices:
     F5:
-      alias: 'F5'
+      alias: '192.168.86.57'
       type: 'F5'
       os: 'BIGIP'
       platform: i2600
       credentials:
         default:
-          username: {{ admin  }}
-          password: {{ your REST API Password }}
+          username: 'admin'
+          password: 'W3lcome098!'

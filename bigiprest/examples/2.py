@@ -5,6 +5,7 @@ import getpass
 import os
 import hashlib
 import csv
+import requests
 
 # Internal imports
 # Import only with "from x import y", to simplify the code.
@@ -20,6 +21,7 @@ for virtual in virtuals:
     print(virtual.properties["name"])
     print(virtual.properties["addressStatus"])
     print("Partition:" + virtual.properties["partition"])
-    print(virtual.properties)
+    print(Panel.fit(Text.from_markup(CLOUD)))
+
 
 
