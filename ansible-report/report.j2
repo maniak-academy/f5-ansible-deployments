@@ -1,3 +1,6 @@
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.css">
+  
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.js"></script>
 <!DOCTYPE html>
 <html>
 <body>
@@ -15,15 +18,22 @@
 <table>
     <thead>
         <tr>
-            <th>Name</th>
             <th>Status</th>
+            <th>Name</th>
+            <th>VIP IP</th>
+            <th>Destination_Port</th>
+            <th>Pool</th>
+
         </tr>
     </thead>
     <tbody>
         {% for item in result %}
         <tr class='{{  item['Status']  }}'>
-            <td>{{ item['Name'] }}</td>
             <td>{{ item['Status'] }}</td>
+            <td>{{ item['Name'] }}</td>
+            <td>{{ item['Destination'] }}</td>
+            <td>{{ item['Destination_Port'] }}</td>
+            <td>{{ item['Pool'] }}</td>
         </tr>
         {% endfor %}
     </tbody>

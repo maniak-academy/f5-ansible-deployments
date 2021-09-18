@@ -26,7 +26,7 @@
       set_fact:
         result: "{{bigip_facts.virtual_servers | json_query(query_string) }}"
       vars:
-        query_string: "[*].{Name: name,Status: availability_status}"
+        query_string: "[*].{Status: availability_status,Name: full_path,Destination: destination_address,Destination_Port: destination_port,Pool: default_pool }"
 
     - debug: "msg={{result}}"
 
