@@ -20,11 +20,13 @@
         </tr>
     </thead>
     <tbody>
-        {% for item in result %}
-        <tr class='{{  item['Status']  }}'>
-            <td>{{ item['Name'] }}</td>
-            <td>{{ item['Status'] }}</td>
+                <tr class='available'>
+            <td>ansible-demo-http-vs</td>
+            <td>available</td>
         </tr>
-        {% endfor %}
-    </tbody>
+                <tr class='available'>
+            <td>apple.com_vs</td>
+            <td>available</td>
+        </tr>
+            </tbody>
 </table>

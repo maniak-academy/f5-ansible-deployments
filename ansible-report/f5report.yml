@@ -11,7 +11,9 @@
       user: "{{ ansible_user }}"
       validate_certs: False
 
+
   tasks:
+
     - name: Query BIG-IP facts
       bigip_device_facts:
         gather_subset:
@@ -19,18 +21,23 @@
         provider: "{{provider}}"
       register: bigip_facts
 
-    - name: DISPLAY COMPLETE BIG-IP SYSTEM INFORMATION
-      debug:
-        var: bigip_facts
-        
+
+    - name: "Show relevant information"
+      set_fact:
+        result: "{{bigip_facts.virtual_servers | json_query(query_string) }}"
+      vars:
+        query_string: "[*].{Name: name,Status: availability_status}"
+
+    - debug: "msg={{result}}"
+
     - local_action:
         module: copy
-        content: "{{ bigip_facts.virtual_servers | to_nice_json }}"
-        dest: virtual-2-servers-outputs.json
+        content: "{{ result }}"
+        dest: virtual-servers-outputs.json
 
     - name: create HTML report
       template:
         src: report.j2
-        dest: cktreport.html
+        dest: f5report.html
       delegate_to: localhost
       run_once: true
