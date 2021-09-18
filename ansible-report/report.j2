@@ -1,0 +1,23 @@
+{% if  virtual-servers-output.json %}Name,Status{% for vs in to_parse_vs %}
+{{ vs.name }},{{ vs.status }}{% endfor %}{% else %}{% if filetype_loop_jinja2 == "md" %}
+# Virtual Servers
+| Name | Status  |
+| ---- | ------- | {% for vs in to_parse_vs %}
+| {{ vs.name }} | {{ vs.description }} | {% endfor %}{% else %}
+<html><head></head><body>
+<h1>Virtual Servers</h1>
+<table class="merlin-table">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>{% for vs in to_parse_vs %}
+  <tr>
+    <td>{{ vs.name }}</td>
+    <td>{{ vs.status }}</td>
+  </tr>{% endfor %}
+  </tbody>  
+</table>
+</body></html>{% endif %}{% endif %}

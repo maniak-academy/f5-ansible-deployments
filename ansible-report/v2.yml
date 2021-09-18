@@ -1,0 +1,43 @@
+---
+- name: Upgrade BIG-IP software
+  hosts: lb
+  connection: local
+  gather_facts: False
+
+  vars:
+    provider:
+      password: "{{ ansible_ssh_pass }}"
+      server: "{{ ansible_host }}"
+      user: "{{ ansible_user }}"
+      validate_certs: False
+
+
+  tasks:
+
+    - name: Query BIG-IP facts
+      bigip_device_facts:
+        gather_subset:
+         - virtual-servers
+        provider: "{{provider}}"
+      register: bigip_facts
+
+
+    - name: "Show relevant information"
+      set_fact:
+        result: "{{bigip_facts.virtual_servers | json_query(query_string) }}"
+      vars:
+        query_string: "[*].{Name: name,Status: availability_status}"
+
+    - debug: "msg={{result}}"
+
+    - local_action:
+        module: copy
+        content: "{{ result }}"
+        dest: virtual-servers-outputs.json
+
+    - name: create HTML report
+      template:
+        src: report.j2
+        dest: /cktreport.html
+      delegate_to: localhost
+      run_once: true
