@@ -11,8 +11,23 @@
       user: "{{ ansible_user }}"
       validate_certs: False
 
-
   tasks:
+    - name: Query BIG-IP facts
+      bigip_device_facts:
+        gather_subset:
+         - system-info
+        provider: "{{provider}}"
+      register: system_info
+
+    # set_fact:
+    #   system_facts: "{{system_info.system_info  | json_query(query_string) }}"
+   #   vars:
+   #    query_string: "[*].[base_mac_address,chassis_serial,platform,product_version]"
+       #sysquery_string: "[*].{Name: base_mac_address, Status: chassis_serial,Full_Path: platform,Destination: product_version }]"
+    
+    - debug: msg="{{system_info.system_info}}"
+
+
 
     - name: Query BIG-IP facts
       bigip_device_facts:
@@ -26,9 +41,9 @@
       set_fact:
         result: "{{bigip_facts.virtual_servers | json_query(query_string) }}"
       vars:
-        query_string: "[*].{Status: availability_status,Name: full_path,Destination: destination_address,Destination_Port: destination_port,Pool: default_pool }"
+        query_string: "[*].{Name: name, Status: availability_status,Full_Path: full_path,Destination: destination_address,Destination_Port: destination_port, Protocol: protocol,Pool: default_pool,Persistance: persistence_profile, Status_Reason: status_reason }"
 
-    - debug: "msg={{result}}"
+   # - debug: "msg={{result}}"
 
     - local_action:
         module: copy
@@ -38,6 +53,6 @@
     - name: create HTML report
       template:
         src: report.j2
-        dest: f5report.html
+        dest: reportf5.html
       delegate_to: localhost
       run_once: true

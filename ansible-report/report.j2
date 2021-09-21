@@ -1,39 +1,49 @@
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.css">
   
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.js"></script>
 <!DOCTYPE html>
 <html>
 <body>
 <head>
-<style>
-.available{
-        color: green;
-}
 
-.unavailable {
-        color: red;
-}
+<style>
+
+  <!-- CSS styling for our HTML report -->
+  {% include 'stylesheet.css.j2' %}
 </style>
+<title>F5 Status Report</title>
+
 </head>
-<table>
+<center>F5 Status Reporter</center>
+<br>
+<br>
+<table class="paleBlueRows">
     <thead>
         <tr>
-            <th>Status</th>
             <th>Name</th>
+            <th>Status</th>
+            <th>Full Path</th>
             <th>VIP IP</th>
             <th>Destination_Port</th>
+            <th>Protocol</th>
             <th>Pool</th>
+            <th>Persistance</th>
+            <th>Status Reason</th>
 
         </tr>
     </thead>
     <tbody>
         {% for item in result %}
         <tr class='{{  item['Status']  }}'>
-            <td>{{ item['Status'] }}</td>
             <td>{{ item['Name'] }}</td>
+            <td>{{ item['Status'] }}</td>
+            <td>{{ item['Full_Path'] }}</td>
             <td>{{ item['Destination'] }}</td>
             <td>{{ item['Destination_Port'] }}</td>
+            <td>{{ item['Protocol'] }}</td>
             <td>{{ item['Pool'] }}</td>
+            <td>{{ item['Persistance'] }}</td>
+            <td>{{ item['Status_Reason'] }}</td>
+
+            
         </tr>
         {% endfor %}
     </tbody>
