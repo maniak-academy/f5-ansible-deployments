@@ -16,14 +16,12 @@
     appAS3tempalte: as3_basic.json
     apps:
       - name: "website_vs"
-        vsip: 10.1.10.100
+        vsip: 10.1.10.102
         vsport: 80
         memberport: 80
-        poolname: "webapp_pool"
+        poolname: "webapp2_pool"
         members:
-          - 10.1.20.11
-          - 10.1.20.12
-          - 10.1.20.13
+          - 10.1.20.15
 
 
   tasks:
