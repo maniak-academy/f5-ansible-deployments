@@ -5,20 +5,29 @@
   gather_facts: false
 
 
-  vars_prompt:
-  - name: partition
-    prompt: What parition do you want to delete?
-    private: no
-    
   vars:
-    bigipmgmt: "192.168.32.129"
+    bigipmgmt1: "192.168.86.50"
+    bigipmgmt1: "192.168.86.46"
     user: "admin"
     password: "W3lcome098!"
 
   tasks:
-    - name: PUSH AS3
+    - name: Delete AS3 DC1
       uri:
-        url: "https://192.168.32.100:443/mgmt/shared/appsvcs/declare/{{ partition }}"
+        url: "https://192.168.86.50:443/mgmt/shared/appsvcs/declare/{{ partition }}"
+        method: DELETE
+        status_code: 200
+        timeout: 300
+        body_format: json
+        force_basic_auth: true
+        user: "{{user}}"
+        password: "{{password}}"
+        validate_certs: false
+      delegate_to: localhost
+
+    - name: Delete AS3 DC2
+      uri:
+        url: "https://192.168.86.46:443/mgmt/shared/appsvcs/declare/{{ partition }}"
         method: DELETE
         status_code: 200
         timeout: 300
