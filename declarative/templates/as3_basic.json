@@ -22,7 +22,9 @@
           },
           "{{ app['poolname'] }}": {
             "class": "Pool",
-            "monitors": ["/Common/http"],
+            "monitors": [
+                "http"
+            ],
             "members": [
               {
                 "servicePort": {{ app['memberport'] }},
