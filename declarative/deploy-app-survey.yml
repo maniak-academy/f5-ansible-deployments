@@ -16,7 +16,7 @@
     appAS3tempalte: as3_basic.json
     apps:
       - name: "website_vs"
-        vsip: "{{vip}}"
+        vsip: '{{vip}}'
         vsport: 80
         memberport: 80
         poolname: "webapp_pool"
