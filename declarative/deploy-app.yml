@@ -12,7 +12,7 @@
     password: "W3lcome098!"
 
     # Application Information
-    partition: preprodapps
+    partition: frontwebapp
     appAS3tempalte: as3_basic.json
     apps:
       - name: webapp
