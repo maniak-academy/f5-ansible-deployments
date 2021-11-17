@@ -10,14 +10,12 @@
     bigipmgmt2: "192.168.86.46"
     user: "admin"
     password: "W3lcome098!"
-    app_name: "{{app_name}}"
-    vip: "{{vip}}"
 
     # Application Information
     partition: "{{partition_name}}"
     appAS3tempalte: as3_basic.json
     apps:
-      - name: "{{app_name}}"
+      - name: "website_vs"
         vsip: "{{vip}}"
         vsport: 80
         memberport: 80
