@@ -1,0 +1,41 @@
+---
+- name: Query Pool Information from Virtual Server
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    virtual_server_name: "virtual-server-name"
+    Partition: "Common"
+  tasks:
+    - name: Query Virtual Server API
+      uri:
+        url: "https://localhost/mgmt/tm/ltm/virtual/~${Partition}~${virtual_server_name}?expandSubcollections=true"
+        method: GET
+        validate_certs: no
+      register: api_response
+
+    - name: Extract Pool Information
+      set_fact:
+        pool_info: "{{ api_response.json | json_query('poolReference.link') }}"
+
+    - name: Query Pool Details
+      uri:
+        url: "{{ pool_info }}"
+        method: GET
+        validate_certs: no
+      register: pool_response
+
+    - name: Extract Pool Members Information
+      set_fact:
+        pool_members_link: "{{ pool_response.json | json_query('membersReference.link') }}"
+
+    - name: Query Pool Members
+      uri:
+        url: "{{ pool_members_link }}"
+        method: GET
+        validate_certs: no
+      register: pool_members_response
+
+    - name: Display Pool Members Information
+      debug:
+        var: pool_members_response.json
